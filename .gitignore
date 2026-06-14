@@ -1,0 +1,7 @@
+# 运行时产物 / 隐私数据（不上传）
+__pycache__/
+*.pyc
+*.log
+*.err
+debug/
+history.json
