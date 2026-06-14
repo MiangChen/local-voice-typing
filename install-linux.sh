@@ -6,11 +6,15 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "[1/4] 系统依赖 (需 sudo)…"
 sudo apt-get update -qq
-sudo apt-get install -y wl-clipboard libnotify-bin ffmpeg pipewire-bin
+# wl-clipboard 剪贴板 / ffmpeg+pipewire 录音 / 后三者=顶栏托盘图标(AppIndicator)
+sudo apt-get install -y wl-clipboard libnotify-bin ffmpeg pipewire-bin \
+     python3-gi gir1.2-gtk-3.0 gir1.2-ayatanaappindicator3-0.1
 
 echo "[2/4] Python 依赖…"
-pip install transformers || pip install --break-system-packages transformers
+PIP="pip install"; $PIP transformers pystray pillow 2>/dev/null || \
+  pip install --break-system-packages transformers pystray pillow
 echo "  注意：GPU 用户请自行安装对应 CUDA 版本的 torch（见 https://pytorch.org）。"
+echo "  GNOME 用户需启用 AppIndicator 扩展(Ubuntu 默认已启用)才能看到顶栏图标。"
 
 echo "[3/4] 开机自启 (~/.config/autostart)…"
 mkdir -p ~/.config/autostart
