@@ -236,21 +236,30 @@ TITLES = {
     "success": "✓ 识别成功", "error": "✗ 识别失败",
 }
 
+WARN_FILL = (245, 179, 1, 255)   # 警示黄；想要红色改成 (226, 59, 59, 255)
+WARN_GLYPH = (40, 30, 0, 255)    # 三角内感叹号颜色（深色）
+
 def make_icon(state):
     from PIL import Image, ImageDraw
     sz = 64
     img = Image.new("RGBA", (sz, sz), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
+    W = (255, 255, 255, 255)
+    if state == "error":
+        # ⚠️ 警示三角 + 感叹号（识别失败/没识别到，更醒目）
+        top, bl, br = (32, 5), (5, 57), (59, 57)
+        d.polygon([top, bl, br], fill=WARN_FILL)
+        # 描边让三角更清晰
+        d.line([top, bl, br, top], fill=(120, 85, 0, 255), width=3, joint="curve")
+        d.rounded_rectangle([28, 22, 36, 43], radius=4, fill=WARN_GLYPH)   # 感叹号竖杠
+        d.ellipse([28, 47, 36, 55], fill=WARN_GLYPH)                       # 感叹号圆点
+        return img
     col = COLORS.get(state, COLORS["idle"])
     d.ellipse([2, 2, sz - 3, sz - 3], fill=col + (255,))
-    W = (255, 255, 255, 255)
     if state == "success":
         d.line([(17, 33), (28, 45), (48, 20)], fill=W, width=7, joint="curve")
-    elif state == "error":
-        d.rounded_rectangle([29, 15, 35, 39], radius=3, fill=W)
-        d.ellipse([28, 44, 36, 52], fill=W)
     else:
-        # 麦克风
+        # 麦克风（loading/idle/recording/transcribing）
         d.rounded_rectangle([26, 14, 38, 37], radius=6, fill=W)
         d.arc([21, 18, 43, 43], start=20, end=160, fill=W, width=4)
         d.line([(32, 43), (32, 50)], fill=W, width=4)
